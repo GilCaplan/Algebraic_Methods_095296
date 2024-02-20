@@ -1,7 +1,8 @@
 import math
 import numpy as np
 
-#Q8
+
+# Q8
 def QR_division(A):
     z, Q = Grand_Shit(A)
     R = find_R(A, Q, z)
@@ -10,69 +11,20 @@ def QR_division(A):
 
 
 def find_R(A, Q, Z):
-    R = np.array([[0 for _ in range(len(A[0]))] for _ in range(len(A[0]))])
-
+    R = np.array([[0 for _ in range(len(A[0]))] for _ in range(len(A[0]))], float)
+    Q = np.array(Q, float)
+    A = np.array(A, float)
     for i in range(len(R)):  # row
         for j in range(len(R[0])):  # col
             if i == j:
-                R[i][i] = math.sqrt(sum(x * x for x in Z.T[i]))
+                R[i][i] = math.sqrt(sum(f ** 2 for f in Z.T[i]))
             elif i < j:
                 R[i][j] = inner_mul(Q.T[i], A.T[j])
     return R
 
 
 def Grand_Shit(A):
-    A = A.T
-    z = np.array([[0 for _ in range(len(A[0]))] for _ in range(len(A))], float)
-    z[0] = A[0]
-
-    for i in range(1, len(A)):
-        series_sum = sum(cal_proj(z[j], A[i]) for j in range(i))
-        z[i] = A[i] - series_sum
-
-    W = np.array([[0 for _ in range(len(z[0]))] for _ in range(len(z))], float)
-    for i in range(len(W)):
-        W[i] = normalize(z[i])
-
-    return z.T, W.T
-
-
-def cal_proj(V1, V2):
-    return (inner_mul(V1, V2) / inner_mul(V1, V1)) * V1
-
-
-def inner_mul(V1, V2):
-    return sum(V1[i] * V2[i] for i in range(len(V1)))
-
-
-def normalize(V):
-    V = np.array(V)
-    x = math.sqrt(sum(V[i] * V[i] for i in range(len(V))))
-    return np.array([v_i / x for v_i in V])
-
-
-def QR_division(A):
-    z, Q = Grand_Shit(A)
-    R = find_R(A, Q, z)
-
-    return Q, R
-
-
-def find_R(A, Q, Z):
-    R = np.array([[0 for _ in range(len(A[0]))] for _ in range(len(A[0]))])
-    Q = np.array(Q)
-    A = np.array(A)
-    for i in range(len(R)):  # row
-        for j in range(len(R[0])):  # col
-            if i == j:
-                R[i][i] = math.sqrt(sum(x * x for x in Z.T[i]))
-            elif i < j:
-                R[i][j] = inner_mul(Q.T[i], A.T[j])
-    return R
-
-
-def Grand_Shit(A):
-    A = np.array(A).T
+    A = np.array(A, float).T
     z = np.array([[0 for _ in range(len(A[0]))] for _ in range(len(A))], float)
     z[0] = A[0]
 
@@ -94,9 +46,9 @@ def inner_mul(V1, V2):
 
 
 def normalize(V):
-    V = np.array(V)
+    V = np.array(V, float)
     x = math.sqrt(sum(V[i] * V[i] for i in range(len(V))))
-    return np.array([v_i / x for v_i in V])
+    return np.array([v_i / x for v_i in V], float)
 
 
 Mat = np.array([[1, -1, 4], [1, 4, -2], [1, 4, 2], [1, -1, 0]])
@@ -124,8 +76,8 @@ x = np.array([21,11,9,6,5,4,2,1,94,91,89,85,84,16,98])
 
 np.set_printoptions(precision=2)
 Q1, R1 = QR_division(M)
-print(Q1)
-print(R1)
+print(f"Q = , {Q1}, \n")
+print(f"R = , {R1}, \n")
 print("part 2:", Q1 @ Q1.T @ x)
 # projection of x on S is equal to P @ P^T @ x
 print("part 3", (np.eye(len(Q1)) - Q1 @ Q1.T) @ x)
