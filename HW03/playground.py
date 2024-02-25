@@ -1,7 +1,9 @@
 import math
 import numpy as np
 
-
+A = np.array([[0,0,1/math.sqrt(2)], [1/math.sqrt(2),1/math.sqrt(2),0],[1/math.sqrt(2),-1/math.sqrt(2),0]])
+B = np.array([[math.sqrt(2),0,0],[0,math.sqrt(2),0],[0,0, 1]])
+print(B @ A)
 # Q8
 def QR_division(A):
     z, Q = Grand_Shit(A)
@@ -51,11 +53,6 @@ def normalize(V):
     return np.array([v_i / x for v_i in V], float)
 
 
-Mat = np.array([[1, -1, 4], [1, 4, -2], [1, 4, 2], [1, -1, 0]])
-Q, R = QR_division(Mat)
-
-
-
 M = [[3, 6, 8, 0, 4, 3, 1, 5, 4, 4],
  [4 ,0 ,6 ,5 ,1 ,9 ,3 ,3 ,3 ,3],
  [5 ,0 ,9 ,8 ,0 ,4 ,9 ,6 ,6 ,4],
@@ -82,4 +79,10 @@ print("part 2:", Q1 @ Q1.T @ x)
 # projection of x on S is equal to P @ P^T @ x
 print("part 3", (np.eye(len(Q1)) - Q1 @ Q1.T) @ x)
 # projection of x on S complement is (I - P @ P^T) @ x as proved in HW02 QB
+
+
+Mat = np.array([[1, -1, 4], [1, 4, -2], [1, 4, 2], [1, -1, 0]])
+Q, R = QR_division(Mat)
+print("example from prev hw: ")
+print('Q= ', Q, "\nR= ", R, "\n")
 
