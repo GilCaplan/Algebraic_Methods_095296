@@ -1,10 +1,7 @@
 import math
 import numpy as np
 
-A = np.array([[0,0,1/math.sqrt(2)], [1/math.sqrt(2),1/math.sqrt(2),0],[1/math.sqrt(2),-1/math.sqrt(2),0]])
-B = np.array([[math.sqrt(2),0,0],[0,math.sqrt(2),0],[0,0, 1]])
-print(B @ A)
-# Q8
+
 def QR_division(A):
     z, Q = Grand_Shit(A)
     R = find_R(A, Q, z)
