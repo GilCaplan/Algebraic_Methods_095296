@@ -1,6 +1,8 @@
 import pickle
 import numpy as np
 from PIL import Image
+from sklearn.decomposition import PCA
+from sklearn.neighbors import KNeighborsClassifier as KNN
 
 
 def unpickle(file):
@@ -18,7 +20,7 @@ def process_batch(path):
     pics = unpickle(path)
     # Step 1: convert all images to gray scale
     images = pics[b'data']
-    labels = pics[b'fine_labels'] if b'fine_labels' in pics else 0
+    labels = pics[b'fine_labels']
     reshaped_images = images.reshape(-1, 3, 32, 32).transpose(0, 2, 3, 1)
     grayscale_images = []
 
@@ -29,14 +31,44 @@ def process_batch(path):
     return np.array(grayscale_images).reshape(-1, 1024), labels
 
 
-grey_images_train, train_labels = process_batch(path:= r'.\cifar-100-python\train')
-grey_images_test = process_batch(r'.\cifar-100-python\test')
+grey_images_train, train_labels = process_batch(path := r'.\cifar-100-python\train')
+grey_images_test, test_labels = process_batch(r'.\cifar-100-python\test')
+
+# check dimensions of the target labels
+print(f'Dimension of the target train labels: {len(train_labels)}')
+print(f'Dimension of the target test labels: {len(test_labels)}')
+
+s_vals = [50, 100, 200, 300]
+
+print(f'Dimension of the original images: {grey_images_train.shape}')
+
+for s in s_vals:
+    pca = PCA(n_components=s)
+
+    # project the images onto the first s principal components
+    pca.fit(grey_images_train)
+    pca.fit(grey_images_test)
+    # convert to numpy array
+    projected_images_train = pca.transform(grey_images_train)
+    projected_images_test = pca.transform(grey_images_test)
+    print(f'Dimension of the projected images: {projected_images_train.shape}')
+
+    # train a k-NN classifier on the projected images
+    knn = KNN(n_neighbors=5)
+    knn.fit(projected_images_train, train_labels)
+
+    print(f'Score for s={s}: {knn.score(projected_images_train, train_labels)}')
+
+# single_img_reshaped = np.reshape(imgs[2], (32, 32))
+# image = Image.fromarray(single_img_reshaped.astype('uint8'))
+# image.show()
+
 
 print()
-#single_img = Image.fromarray(grayscale_images[1])
-#single_img.show()
+# single_img = Image.fromarray(grayscale_images[1])
+# single_img.show()
 
 
-#single_img_reshaped = np.transpose(np.reshape(single_img, (3, 32, 32)), (1, 2, 0))
+# single_img_reshaped = np.transpose(np.reshape(single_img, (3, 32, 32)), (1, 2, 0))
 # image = Image.fromarray(single_img_reshaped.astype('uint8'))
 # image.show()
