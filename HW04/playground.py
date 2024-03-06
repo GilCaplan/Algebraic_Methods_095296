@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsClassifier as KNN
+from sklearn.preprocessing import StandardScaler
 
 
 def unpickle(file):
@@ -37,38 +38,25 @@ grey_images_test, test_labels = process_batch(r'.\cifar-100-python\test')
 # check dimensions of the target labels
 print(f'Dimension of the target train labels: {len(train_labels)}')
 print(f'Dimension of the target test labels: {len(test_labels)}')
-
-s_vals = [50, 100, 200, 300]
-
 print(f'Dimension of the original images: {grey_images_train.shape}')
 
-for s in s_vals:
-    pca = PCA(n_components=s)
 
-    # project the images onto the first s principal components
-    pca.fit(grey_images_train)
-    pca.fit(grey_images_test)
-    # convert to numpy array
-    projected_images_train = pca.transform(grey_images_train)
-    projected_images_test = pca.transform(grey_images_test)
-    print(f'Dimension of the projected images: {projected_images_train.shape}')
+def run_PCA_KNN_ondata(s_vals):
+    for s in s_vals:
+        pca = PCA(n_components=s)
 
-    # train a k-NN classifier on the projected images
-    knn = KNN(n_neighbors=5)
-    knn.fit(projected_images_train, train_labels)
+        # project the images onto the first s principal components
+        pca.fit(grey_images_train)
+        pca.fit(grey_images_test)
+        # convert to numpy array
+        projected_images_train = pca.transform(grey_images_train)
+        projected_images_test = pca.transform(grey_images_test)
+        print(f'Dimension of the projected images: {projected_images_train.shape}')
 
-    print(f'Score for s={s}: {knn.score(projected_images_train, train_labels)}')
+        # train a k-NN classifier on the projected images
+        knn = KNN(n_neighbors=5)
+        knn.fit(projected_images_train, train_labels)
 
-# single_img_reshaped = np.reshape(imgs[2], (32, 32))
-# image = Image.fromarray(single_img_reshaped.astype('uint8'))
-# image.show()
+        print(f'Score for s={s}: {knn.score(projected_images_train, train_labels)}')
 
-
-print()
-# single_img = Image.fromarray(grayscale_images[1])
-# single_img.show()
-
-
-# single_img_reshaped = np.transpose(np.reshape(single_img, (3, 32, 32)), (1, 2, 0))
-# image = Image.fromarray(single_img_reshaped.astype('uint8'))
-# image.show()
+run_PCA_KNN_ondata([50, 100, 200, 300])
