@@ -41,8 +41,8 @@ print(f'Dimension of the target test labels: {len(test_labels)}')
 print(f'Dimension of the original images: {grey_images_train.shape}')
 
 
-def run_PCA_KNN_ondata(s_vals):
-    for s in s_vals:
+def run_PCA_KNN_ondata(s_vals, k_vals):
+    for s, k in zip(s_vals, k_vals):
         pca = PCA(n_components=s)
 
         # project the images onto the first s principal components
@@ -54,9 +54,9 @@ def run_PCA_KNN_ondata(s_vals):
         print(f'Dimension of the projected images: {projected_images_train.shape}')
 
         # train a k-NN classifier on the projected images
-        knn = KNN(n_neighbors=5)
+        knn = KNN(n_neighbors=k)
         knn.fit(projected_images_train, train_labels)
 
         print(f'Score for s={s}: {knn.score(projected_images_train, train_labels)}')
 
-run_PCA_KNN_ondata([50, 100, 200, 300])
+run_PCA_KNN_ondata([50, 100, 200, 300], [5 for _ in range(5)])
