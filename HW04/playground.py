@@ -3,7 +3,6 @@ import numpy as np
 from PIL import Image
 from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsClassifier as KNN
-from sklearn.preprocessing import StandardScaler
 
 
 def unpickle(file):
@@ -41,22 +40,33 @@ print(f'Dimension of the target test labels: {len(test_labels)}')
 print(f'Dimension of the original images: {grey_images_train.shape}')
 
 
-def run_PCA_KNN_ondata(s_vals, k_vals):
+def run_PCA_KNN_on_data(s_vals, k_vals):
     for s, k in zip(s_vals, k_vals):
         pca = PCA(n_components=s)
 
         # project the images onto the first s principal components
         pca.fit(grey_images_train)
-        pca.fit(grey_images_test)
-        # convert to numpy array
         projected_images_train = pca.transform(grey_images_train)
-        projected_images_test = pca.transform(grey_images_test)
         print(f'Dimension of the projected images: {projected_images_train.shape}')
 
         # train a k-NN classifier on the projected images
         knn = KNN(n_neighbors=k)
         knn.fit(projected_images_train, train_labels)
 
-        print(f'Score for s={s}: {knn.score(projected_images_train, train_labels)}')
+        # Predict on the training set using transformed data
+        pred_train = knn.predict(projected_images_train)
 
-run_PCA_KNN_ondata([50, 100, 200, 300], [5 for _ in range(5)])
+        # Calculate training accuracy
+        train_accuracy = np.mean(pred_train == train_labels)
+        print(f"Training Accuracy for s={s}, k={k}: {train_accuracy}")
+
+        # Uncomment the following lines if you want to calculate test accuracy
+        projected_images_test = pca.transform(grey_images_test)
+        projected_images_test = pca.transform(grey_images_test)
+        pred_test = knn.predict(projected_images_test)
+        accuracy = np.mean(pred_test == test_labels)
+        print(f"Test Accuracy for s={s}, k={k}: {accuracy}")
+
+
+# Assuming grey_images_train, train_labels, grey_images_test, and test_labels are defined
+run_PCA_KNN_on_data(s_vals := [40, 50], [6 for _ in range(len(s_vals))])
