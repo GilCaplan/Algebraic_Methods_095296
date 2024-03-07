@@ -5,6 +5,33 @@ from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsClassifier as KNN
 
 
+class KNNCls:
+    def __init__(self, k=3):
+        self.k = k
+
+    def fit(self, X_train, y_train):
+        self.X_train = X_train
+        self.y_train = y_train
+
+    def predict(self, X_test):
+        predictions = []
+        for x in X_test:
+            # Calculate distances between x and all examples in the training set
+            distances = [(sum(x[i] - x_train[i] for i in range(len(x))), y_train) for x_train, y_train in zip(self.X_train, self.y_train)]
+            # Use np.argpartition with a custom key function to find indices of k smallest elements
+            close_k_indices = np.argsort(distances)[:self.k]
+
+            label_counts = {} 
+            # (distance, label)
+            for _, label in close_k_indices:
+                label_counts[label] = label_counts.get(label, 0) + 1
+
+            # Find the most common label
+            predictions.append(sorted(label_counts.items(), key=lambda x: x[1], reverse=True)[0][0])
+
+        return np.array(predictions)
+
+
 def unpickle(file):
     with open(file, 'rb') as fo:
         images = pickle.load(fo, encoding='bytes')
@@ -39,6 +66,8 @@ print(f'Dimension of the target train labels: {len(train_labels)}')
 print(f'Dimension of the target test labels: {len(test_labels)}')
 print(f'Dimension of the original images: {grey_images_train.shape}')
 
+def KNN_1():
+    pass
 
 def run_PCA_KNN_on_data(s_vals, k_vals):
     for s, k in zip(s_vals, k_vals):
@@ -50,7 +79,8 @@ def run_PCA_KNN_on_data(s_vals, k_vals):
         print(f'Dimension of the projected images: {projected_images_train.shape}')
 
         # train a k-NN classifier on the projected images
-        knn = KNN(n_neighbors=k)
+        #knn = KNN(n_neighbors=k)
+        knn = KNNCls()
         knn.fit(projected_images_train, train_labels)
 
         # Predict on the training set using transformed data
